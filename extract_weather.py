@@ -1,6 +1,7 @@
 import requests
 import pandas as pd
 from datetime import date, timedelta
+import os
 
 # Helsinki coordinates
 latitude = 60.1695
@@ -51,5 +52,6 @@ for year in range(start_year, end_year + 1):
 weather_df = pd.concat(all_data, ignore_index=True)
 
 # Save to CSV
-weather_df.to_csv("helsinki_weather_2010_2024.csv", index=False)
+os.makedirs("data", exist_ok=True)
+weather_df.to_csv("data/helsinki_weather_2010_2024.csv", index=False)
 print("Saved to helsini_weather_2010_2024.csv")
