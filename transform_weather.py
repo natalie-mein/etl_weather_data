@@ -1,22 +1,17 @@
 import pandas as pd
-import json
+from clean_weather_data import clean_weather_data
 
-# remember to check that the csv goes in a folder
-with open("data/helsinki_weather_raw.json", "r") as f:
-    raw = json.load(f)
+# load raw extracted data
+df = pd.read_csv("data/helsinki_weather_2010_2024.csv")
 
-# Extract fields
-dates = raw["daily"]["time"]
-temp_min = raw["daily"]["temperature_2m_min"]
-temp_max = raw["daily"]["temperature_2m_max"]
-precip = raw["daily"]["precipitation_sum"]
+# convert date column to datetime
+df["time"] = pd.to_datetime(df["time"])
 
-# DataFrame
-df = pd.DataFrame({
-    "date": dates,
-    "temperature_min": temp_min,
-    "temperature_max": temp_max,
-    "precipitation": precip
+df = df.rename(columns={
+    "time": "date",
+    "temperature_2m_min": "temperature_min",
+    "temperature_2m_max": "temperature_max",
+    "precipitation_sum": "precipitation"
 })
 
 # datetime type
@@ -25,6 +20,10 @@ df["date"] = pd.to_datetime(df["date"])
 # Sort by date just in case
 df = df.sort_values("date")
 
-# Save transformed data
-df.to_csv("data/helsinki_weather_transformed.csv", index=False)
-print("Transformed data saved.")
+# clean the data
+df_clean = clean_weather_data(df)
+
+# Save transformed data to parquet
+df_clean.to_parquet("data/helsinki_weather_transformed.parquet", index=False)
+
+print("Transformed and cleaned data saved.")
